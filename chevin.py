@@ -418,11 +418,12 @@ class GeotabReportGenerator:
             return ''
     
     def km_to_miles(self, km: float) -> float:
-        """Convert kilometers to miles."""
+        """Convert kilometers to miles and round to 1 decimal place."""
         if km is None or km == '':
             return 0
         try:
-            return float(km) * 0.621371
+            miles = float(km) * 0.621371
+            return round(miles, 1) if miles else 0
         except (ValueError, TypeError):
             return 0
     
@@ -431,8 +432,14 @@ class GeotabReportGenerator:
         return self.format_duration(ms)
     
     def kmh_to_mph(self, kmh: float) -> float:
-        """Convert km/h to mph."""
-        return kmh * 0.621371 if kmh else 0
+        """Convert km/h to mph and round to 1 decimal place."""
+        if kmh is None or kmh == '':
+            return 0
+        try:
+            mph = float(kmh) * 0.621371
+            return round(mph, 1) if mph else 0
+        except (ValueError, TypeError):
+            return 0
 
     def get_most_recent_trip_from_cache(self, device_id: str) -> dict:
         """Get the most recent trip for a device from cached trips data."""
@@ -448,33 +455,38 @@ class GeotabReportGenerator:
         return device_trips[0]
     
     def meters_to_miles(self, meters: float) -> float:
-        """Convert meters to miles."""
+        """Convert meters to miles and round to 1 decimal place."""
         if meters is None or meters == '':
             return 0
         try:
-            return float(meters) * 0.000621371
+            miles = float(meters) * 0.000621371
+            return round(miles, 1) if miles else 0
         except (ValueError, TypeError):
             return 0
 
+    def get_current_engine_hours(self, device_id: str) -> float:
+        """Get current engine hours for device from cached data, converted from seconds to hours."""
+        # The cache_batch_data() method already stores the latest reading per device
+        # by comparing dateTime values, so we can directly use the cached data
+        data = self.engine_hours_data_cache.get(device_id, {})
+        engine_hours_seconds = data.get('data', 0) if data else 0
+        # Convert from seconds to hours
+        return round(engine_hours_seconds / 3600, 1) if engine_hours_seconds else 0
+
     def get_current_odometer(self, device_id: str) -> float:
-        """Get current odometer reading for device from cached data, converted to miles."""
+        """Get current odometer reading for device from cached data, converted to miles and rounded."""
         # The cache_batch_data() method already stores the latest reading per device
         # by comparing dateTime values, so we can directly use the cached data
         data = self.odometer_data_cache.get(device_id, {})
         odometer_meters = data.get('data', 0) if data else 0
-        return self.meters_to_miles(odometer_meters)
+        miles = self.meters_to_miles(odometer_meters)
+        return round(miles, 1) if miles else 0
 
-    def get_current_engine_hours(self, device_id: str) -> float:
-        """Get current engine hours for device from cached data."""
-        # The cache_batch_data() method already stores the latest reading per device
-        # by comparing dateTime values, so we can directly use the cached data
-        data = self.engine_hours_data_cache.get(device_id, {})
-        return data.get('data', 0) if data else 0
-    
     def get_trip_odometer_at_start(self, device_id: str, trip_start: str) -> float:
-        """Get odometer reading at trip start from cached odometer data, converted to miles."""
+        """Get odometer reading at trip start from cached data, converted to miles and rounded."""
         # Use the cached odometer data - return the latest reading we have
-        return self.get_current_odometer(device_id)
+        odometer = self.get_current_odometer(device_id)
+        return round(odometer, 1) if odometer else 0
     
     def generate_asset_status_report(self) -> pd.DataFrame:
         """Generate Asset Status Report using cached data."""
