@@ -93,7 +93,7 @@ class GeotabReportGenerator:
             
             # Add rate limiting - wait 0.15 seconds between address API calls
             # This ensures we stay under 450 calls per minute (6.67 calls per second max)
-            time.sleep(0.15)
+            time.sleep(0.20)
             
             result = self.api.call('GetAddresses', coordinates=coordinates)
             return result
