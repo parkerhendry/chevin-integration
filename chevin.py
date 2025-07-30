@@ -797,6 +797,11 @@ class GeotabReportGenerator:
             # Convert report name to lowercase and replace underscores with spaces
             formatted_name = report_name.lower().replace('_', ' ')
             filename = f"washingtongas_{formatted_name}_{timestamp}.xls"
+            try:
+                self.save_df_to_xls(df, filename)
+                print(f"Saved {report_name} to {filename}")
+            except Exception as e:
+                print(f"Error saving {report_name} to .xls: {e}")
 
     def save_reports_to_sftp(self, reports: Dict[str, pd.DataFrame]):
         """Save all reports to .xls files and upload to SFTP server."""
