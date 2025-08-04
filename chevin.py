@@ -15,18 +15,15 @@ import os
 SFTP_CONFIG = {
     "host": "ftpus.chevinfleet.com",
     "port": 22,
-    "username": "WashingtonGas",
-    "password": "&x3nudE#RfbL_GTW",
-    "dir": "Import"
+    "username": "USERNAME HERE",
+    "password": "PASSWORD HERE",
+    "dir": "DIRECTORY HERE"
 }
 
-# Geotab API credentials (set these as environment variables)
-#GEO_USER = os.getenv('GEO_USER', 'your_username')
-#GEO_DATABASE = os.getenv('GEO_DATABASE', 'your_database')
-#GEO_PASSWORD = os.getenv('GEO_PASSWORD', 'your_password')
-GEO_USER = 'chevin'
-GEO_DATABASE = 'washingtongas'
-GEO_PASSWORD = 'fleetwaveintegration'
+# Geotab API credentials
+GEO_USER = 'GEOTAB USRERNAME HERE'
+GEO_DATABASE = 'GEOTAB DATABASE HERE'
+GEO_PASSWORD = 'GEOTAB PASSWORD HERE'
 
 # Global API instance
 geotab_api = None
@@ -50,11 +47,6 @@ class GeotabReportGenerator:
         # StatusData caches - organized by device_id for quick lookup
         self.odometer_data_cache = {}  # device_id -> latest odometer data
         self.engine_hours_data_cache = {}  # device_id -> latest engine hours data
-
-        self.sftp_host = "ftpus.chevinfleet.com"
-        self.sftp_username = "WashingtonGas"
-        self.sftp_password = "&x3nudE#RfbL_GTW"
-        self.sftp_port = 22
         
         # File configuration for sync
         self.remote_dir = "Export/geotab"
@@ -924,12 +916,12 @@ class GeotabReportGenerator:
             remote_path = f"{self.remote_dir}/{self.remote_file}"
             local_path = f"{self.local_dir}/{self.local_file}"
             
-            print(f"Connecting to SFTP server: {self.sftp_host}")
+            print(f"Connecting to SFTP server: {SFTP_CONFIG['host']}")
             with pysftp.Connection(
-                host=self.sftp_host,
-                username=self.sftp_username,
-                password=self.sftp_password,
-                port=self.sftp_port
+                host=SFTP_CONFIG["host"],
+                username=SFTP_CONFIG["username"],
+                password=SFTP_CONFIG["password"],
+                port=SFTP_CONFIG["port"]
             ) as sftp:
                 # Check if remote directory exists and has files
                 try:
